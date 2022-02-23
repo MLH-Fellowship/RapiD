@@ -278,11 +278,12 @@ export default {
     },
     // Get filtered Map features (streetLihgts, pols, etc)
     filteredMapFeatures: function(projection) {
-        const filterObjects= ['object--street-light', 'object--support--pole', 'object--street-light' ,'object--bike-rack' ];
+        const filterObjects= ['object--support--utility-pole', 'object--street-light', 'object--bench' ,'object--bike-rack', 'object--fire-hydrant' ];
         const mapFeatures = this.mapFeatures(projection);
-        const filteredMapFeatures = mapFeatures.filter((feature) =>  filterObjects.includes(feature.value) );
-        return filteredMapFeatures;
+        const filteredMapFeaturesObjects = mapFeatures.filter((feature) =>  filterObjects.includes(feature.value) );
+        return filteredMapFeaturesObjects;
     },
+
 
     // Get cached image by id
     cachedImage: function(imageId) {

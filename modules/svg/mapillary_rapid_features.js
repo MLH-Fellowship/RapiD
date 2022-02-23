@@ -106,6 +106,8 @@ export function svgMapillaryMapFeatures(projection, context, dispatch) {
         const service = getService();
         let data = (service ? service.filteredMapFeatures(projection) : []);
         data = filterData(data);
+        // eslint-disable-next-line no-console
+        console.log('🚀 ~ file: mapillary_rapid_features.js ~ line 109 ~ update ~ data', data);
 
 
         const transform = svgPointTransform(projection);

@@ -280,16 +280,16 @@ export default {
     // Get filtered Map features (streetLihgts, pols, etc)
     filteredMapFeatures: function(projection) {
         const filterObjects= ['object--support--utility-pole', 'object--street-light', 'object--bench' ,'object--bike-rack', 'object--fire-hydrant' ];
-        //const mapFeatures = this.mapFeatures(projection);
+        const mapFeatures = this.mapFeatures(projection);
         // https://graph.mapillary.com/map_features?access_token="mly-something"&fields=id,geometry,images&bbox=12.9,55.7,13.1,55.9&object_values=object--support--utility-pole,object--street-light,object--bench,object--bike-rack,object--fire-hydrant
         //to calculate teh bbox: context.map().extent().polygon()
-        const bbox = projection.clipExtent().bbox();
-        const url = `https://graph.mapillary.com/map_features?access_token=${MAPILLARY_ACCESS_TOKEN}&fields=id,geometry,images&bbox=${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}&object_values=${filterObjects.join(',')}`;
-        const DATA = loadData(url);
+        //const bbox = projection.clipExtent().bbox();
+        //const url = `https://graph.mapillary.com/map_features?access_token=MLY|3376030635833192|f13ab0bdf6b2f7b99e0d8bd5868e1d88&fields=id,geometry,images&bbox=${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}&object_values=${filterObjects.join(',')}`;
+
         // eslint-disable-next-line no-console
-        console.log('From FilteredMapFeatures',DATA);
-        return loadData(url);
-        //return mapFeatures.filter((feature) =>  filterObjects.includes(feature.value));
+
+        //return loadData(url);
+        return mapFeatures.filter((feature) =>  filterObjects.includes(feature.value));
     },
 
     // Get cached image by id

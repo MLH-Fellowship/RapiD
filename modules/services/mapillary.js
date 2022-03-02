@@ -229,23 +229,24 @@ function searchLimited(limit, projection, rtree) {
             return (found.length ? result.concat(found) : result);
         }, []);
 }
-function pointToTileFraction (lon, lat, z) {
-    var sin = Math.sin(lat * (Math.PI / 180)),
-        z2 = Math.pow(2, z),
-        x = z2 * (lon / 360 + 0.5),
-        y = z2 * (0.5 - 0.25 * Math.log((1 + sin) / (1 - sin)) / Math.PI);
+//?  used to get the min and max of bbox
+// function pointToTileFraction (lon, lat, z) {
+//     var sin = Math.sin(lat * (Math.PI / 180)),
+//         z2 = Math.pow(2, z),
+//         x = z2 * (lon / 360 + 0.5),
+//         y = z2 * (0.5 - 0.25 * Math.log((1 + sin) / (1 - sin)) / Math.PI);
 
-    // Wrap Tile X
-    x = x % z2;
-    if (x < 0) x = x + z2;
-    return [x, y, z];
-}
-function pointToTile(lon, lat, z) {
-    var tile = pointToTileFraction(lon, lat, z);
-    tile[0] = Math.floor(tile[0]);
-    tile[1] = Math.floor(tile[1]);
-    return tile;
-}
+//     // Wrap Tile X
+//     x = x % z2;
+//     if (x < 0) x = x + z2;
+//     return [x, y, z];
+// }
+// function pointToTile(lon, lat, z) {
+//     var tile = pointToTileFraction(lon, lat, z);
+//     tile[0] = Math.floor(tile[0]);
+//     tile[1] = Math.floor(tile[1]);
+//     return tile;
+// }
 
 
 export default {
@@ -292,14 +293,16 @@ export default {
     mapFeatures: function(projection) {
         const limit = 5;
         const ret = searchLimited(limit, projection, _mlyCache.points.rtree);
+        // eslint-disable-next-line no-console
+        console.log(ret);
         return ret;
     },
 
 
     // Get filtered Map features (streetLihgts, pols, etc)
-    filteredMapFeatures: function(projection) {
+    filteredMapFeatures: function() {
         const filterObjects= ['object--support--utility-pole', 'object--street-light', 'object--bench' ,'object--bike-rack', 'object--fire-hydrant' ];
-        const fields = ['id', 'geometry', 'images'];
+        const fields = ['id', 'geometry', 'images', 'first_seen_at', 'last_seen_at', 'object_value', 'location'];
         //const mapFeatures = this.mapFeatures(projection);
         // https://graph.mapillary.com/map_features?access_token="mly-something"&fields=id,geometry,images&bbox=12.9,55.7,13.1,55.9&object_values=object--support--utility-pole,object--street-light,object--bench,object--bike-rack,object--fire-hydrant
 
@@ -313,17 +316,24 @@ export default {
         */
         // eslint-disable-next-line no-undef
         var bboxCoords = context.map().extent().polygon();
-        var min = pointToTile(bboxCoords[0], bboxCoords[1], 32);
-        var max = pointToTile(bboxCoords[2], bboxCoords[3], 32);
-        var bbox = [min[0], min[1], max[0], max[1]];
+        // var min = pointToTile(bboxCoords[0], bboxCoords[1], 32);
+        // var max = pointToTile(bboxCoords[2], bboxCoords[3], 32);
+        var minX = Math.min(bboxCoords[0][0], bboxCoords[1][0], bboxCoords[2][0], bboxCoords[3][0]);
+        var minY = Math.min(bboxCoords[0][1], bboxCoords[1][1], bboxCoords[2][1], bboxCoords[3][1]);
+        var maxX = Math.max(bboxCoords[0][0], bboxCoords[1][0], bboxCoords[2][0], bboxCoords[3][0]);
+        var maxY = Math.max(bboxCoords[0][1], bboxCoords[1][1], bboxCoords[2][1], bboxCoords[3][1]);
+        var bbox = [minX, minY, maxX, maxY];
 
         var objectValues = filterObjects.join(',');
         var fieldsValues = fields.join(',');
         var url = `${apiUrl}map_features?access_token=${accessToken}&fields=${fieldsValues}&bbox=${bbox[0]},${bbox[1]},${bbox[2]},${bbox[3]}&object_values=${objectValues}`;
-        return loadData(url);
-        // eslint-disable-next-line no-console
-
-
+        return loadData(url).then((response) => {
+            // eslint-disable-next-line no-console
+            console.log(response);
+            return response;
+        });
+        //? old way to return the filtered map features needs to take projection as an argument
+        //const mapFeatures = this.mapFeatures(projection);
         //return mapFeatures.filter((feature) =>  filterObjects.includes(feature.value));
     },
 

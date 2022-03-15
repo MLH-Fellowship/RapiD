@@ -281,7 +281,13 @@ export default {
     filteredMapFeatures: function(projection) {
         const filterObjects= ['object--support--utility-pole', 'object--street-light', 'object--bench' ,'object--bike-rack', 'object--fire-hydrant' ];
         const mapFeatures = this.mapFeatures(projection);
-        return mapFeatures.filter((feature) =>  filterObjects.includes(feature.value));
+        const filteredFeatures =  mapFeatures.filter((feature) =>  filterObjects.includes(feature.value));
+        const filteredFeaturesWithFBID = filteredFeatures.map((feature) => {
+            feature.__fbid__  = -feature.id;
+            return feature;
+        });
+        console.log(filteredFeaturesWithFBID);
+        return filteredFeaturesWithFBID;
     },
 
     // Get cached image by id

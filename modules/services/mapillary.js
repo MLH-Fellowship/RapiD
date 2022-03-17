@@ -284,13 +284,13 @@ export default {
         const mapFeatures = this.mapFeatures(projection);
         const rawData = mapFeatures.filter((feature) =>  filterObjects.includes(feature.value));
         rawData.map(each => {
-            each.__fbid__ = -each.id
-            each.__datasetid__ = "rapidMapFeatures-conflated"
+            each.__fbid__ = -each.id;
+            each.__datasetid__ = 'rapidMapFeatures-conflated';
             each.tags = {
                 tag: 'sample tag',
                 rapid: 'hello world'
-            }
-            return each
+            };
+            return each;
         });
         return rawData;
     },

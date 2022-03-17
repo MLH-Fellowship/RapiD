@@ -7,8 +7,10 @@ import { VectorTile } from '@mapbox/vector-tile';
 import Protobuf from 'pbf';
 import RBush from 'rbush';
 
+import { coreGraph, coreTree } from '../core';
+
 import { utilRebind } from '../util';
-import { osmTagSuggestingArea } from '../osm';
+import { osmNode, osmTagSuggestingArea } from '../osm';
 
 const accessToken = 'MLY|3376030635833192|f13ab0bdf6b2f7b99e0d8bd5868e1d88';
 const apiUrl = 'https://graph.mapillary.com/';
@@ -16,6 +18,9 @@ const baseTileUrl = 'https://tiles.mapillary.com/maps/vtp';
 const mapFeatureTileUrl = `${baseTileUrl}/mly_map_feature_point/2/{z}/{x}/{y}?access_token=${accessToken}`;
 const tileUrl = `${baseTileUrl}/mly1_public/2/{z}/{x}/{y}?access_token=${accessToken}`;
 const trafficSignTileUrl = `${baseTileUrl}/mly_map_feature_traffic_sign/2/{z}/{x}/{y}?access_token=${accessToken}`;
+
+var _datasets = {};
+
 
 const viewercss = 'mapillary-js/mapillary.css';
 const viewerjs = 'mapillary-js/mapillary.js';
@@ -279,20 +284,53 @@ export default {
         return ret;
     },
     // Get filtered Map (points) features (utility-pole, street-light, bench, bike-rack, fire-hydrant)
-    filteredMapFeatures: function(projection) {
+    filteredMapFeatures: function( projection , datasetID ) {
         const filterObjects= ['object--support--utility-pole', 'object--street-light', 'object--bench' ,'object--bike-rack', 'object--fire-hydrant' ];
         const mapFeatures = this.mapFeatures(projection);
         const rawData = mapFeatures.filter((feature) =>  filterObjects.includes(feature.value));
-        rawData.map(each => {
-            each.__fbid__ = -each.id;
-            each.__datasetid__ = 'rapidMapFeatures-conflated';
-            each.tags = {
-                tag: 'sample tag',
-                rapid: 'hello world'
+        const data =this.rapidData(rawData);
+        // rawData.map(each => {
+        //     each.__fbid__ = -each.id;
+        //     each.__datasetid__ = 'rapidMapFeatures-conflated';
+        //     each.tags = {
+        //         tag: 'sample tag',
+        //         rapid: 'hello world'
+        //     };
+        //     return osmNode();
+        // });
+        if (!datasetID) datasetID = 'rapidMapFeatures-conflated';
+        var ds = _datasets[datasetID];
+        var graph, tree, cache;
+        if (ds) {
+            graph = ds.graph;
+            tree = ds.tree;
+            cache = ds.cache;
+        } else {
+            // as tile requests arrive, setup the resources needed to hold the results
+            graph = coreGraph();
+            tree = coreTree(graph);
+            cache = { inflight: {}, loaded: {}, seen: {}, origIdTile: {} };
+            ds = { id: datasetID, graph: graph, tree: tree, cache: cache };
+            _datasets[datasetID] = ds;
+            console.log('new dataset', datasetID);
+        }
+
+        console.log('🚀 ~ file: mapillary.js ~ line 320 ~ data', data);
+        return data;
+    },
+    // Convert to osmNode
+    rapidData: function(data) {
+        return data.map(function(d) {
+            var meta = {
+                __fbid__ : -d.id,
+                __datasetid__ : 'rapidMapFeatures-conflated',
+                tags : {
+                    tag: 'sample tag',
+                    rapid: 'hello world'
+                }
             };
-            return each;
+            return Object.assign(osmNode(d), meta);
         });
-        return rawData;
     },
 
     // Get cached image by id

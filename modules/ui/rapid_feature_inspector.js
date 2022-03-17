@@ -52,7 +52,9 @@ export function uiRapidFeatureInspector(context, keybinding) {
       id: _datum.id,
       origid: _datum.__origid__
     };
+    // turn into If else and add mapillary
     const service = _datum.__service__ === 'esri' ? services.esriData : services.fbMLRoads;
+    
     const graph = service.graph(_datum.__datasetid__);
     console.log(graph)
     const sourceTag = _datum.tags && _datum.tags.source;

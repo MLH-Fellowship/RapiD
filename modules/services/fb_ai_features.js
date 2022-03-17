@@ -217,7 +217,7 @@ export default {
         var cache = { inflight: {}, loaded: {}, seen: {}, origIdTile: {} };
         var ds = { id: datasetID, graph: graph, tree: tree, cache: cache };
         _datasets[datasetID] = ds;
-        console.log(_datasets)
+        //console.log(_datasets)
     },
 
     reset: function() {
@@ -334,7 +334,7 @@ export default {
                         cache.loaded[tile.id] = true;
                         dispatch.call('loadedData');
                     });
-                    console.log(dom)
+                    //console.log(dom)
                 })
                 .catch(function() {});
             cache.inflight[tile.id] = controller;

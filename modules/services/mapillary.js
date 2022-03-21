@@ -265,6 +265,12 @@ export default {
         _mlyActiveImage = null;
     },
 
+    graph: function (datasetID)  {
+        const ds = _datasets[datasetID];
+        return ds && ds.graph;
+      },
+
+
     // Get visible images
     images: function(projection) {
         const limit = 5;
@@ -312,10 +318,8 @@ export default {
             cache = { inflight: {}, loaded: {}, seen: {}, origIdTile: {} };
             ds = { id: datasetID, graph: graph, tree: tree, cache: cache };
             _datasets[datasetID] = ds;
-            console.log('new dataset', datasetID);
         }
 
-        console.log('🚀 ~ file: mapillary.js ~ line 320 ~ data', data);
         return data;
     },
     // Convert to osmNode
@@ -324,6 +328,7 @@ export default {
             var meta = {
                 __fbid__ : -d.id,
                 __datasetid__ : 'rapidMapFeatures-conflated',
+                __service__ : 'mapillary',
                 tags : {
                     tag: 'sample tag',
                     rapid: 'hello world'

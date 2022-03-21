@@ -69,9 +69,12 @@ function removeMetadata(entity) {
 
 
 export function actionRapidAcceptFeature(entityID, extGraph) {
+    console.log( '🚀 ~ file: rapid_accept_feature.js ~ line 72 ~ actionRapidAcceptFeature ~ extGraph', extGraph);
     return function(graph) {
-        var seenRelations = {};    // keep track of seen relations to avoid infinite recursion
+        var seenRelations = {};
+          // keep track of seen relations to avoid infinite recursion
         var extEntity = extGraph.entity(entityID);
+        console.log('🚀 ~ file: rapid_accept_feature.js ~ line 78 ~ returnfunction ~ extEntity', extEntity)
         if (extEntity.type === 'node') {
             acceptNode(extEntity);
         } else if (extEntity.type === 'way') {

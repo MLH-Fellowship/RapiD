@@ -53,10 +53,17 @@ export function uiRapidFeatureInspector(context, keybinding) {
       origid: _datum.__origid__
     };
     // turn into If else and add mapillary
-    const service = _datum.__service__ === 'esri' ? services.esriData : services.fbMLRoads;
-    
+    let service = [];
+    if (_datum.__service__ === 'esri'){
+      service = services.esriData;
+    } else if (_datum.__service__ === 'mapillary'){
+      service = services.mapillary;
+    } else {
+       service = services.fbMLRoads;
+      }
+
     const graph = service.graph(_datum.__datasetid__);
-    console.log(graph)
+    console.log(graph);
     const sourceTag = _datum.tags && _datum.tags.source;
     if (sourceTag) annotation.source = sourceTag;
 
